@@ -11,7 +11,7 @@ const ListingCard = props => {
           <Text style={{color: '#F1F2EB', backgroundColor: 'yellow'}}>
             {props.sellerStatus}
           </Text>
-          <Text style={{color: '#black', fontSize: 16}}>
+          <Text style={{color: '#black', fontSize: 14}}>
             {props.sellerName} {props.sellerLastName}
           </Text>
         </View>
@@ -74,9 +74,8 @@ const ListingCard = props => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0,
     backgroundColor: '#F5F6F4',
-    height: 'auto',
     padding: 10,
     paddingHorizontal: 25,
     marginVertical: 10,
@@ -103,13 +102,12 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   ticker: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 2,
   },
   label: {
     fontWeight: '500',
-    paddingTop: 5,
   },
   btn: {
     backgroundColor: 'black',
@@ -119,15 +117,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 15,
-    height: 45,
+    height: 35,
     width: 100,
   },
   btnText: {
     color: '#F1F2EB',
   },
   imageBackground: {
-    width: 45,
-    height: 45,
+    width: 35,
+    height: 35,
     borderRadius: 100,
     overflow: 'hidden',
   },

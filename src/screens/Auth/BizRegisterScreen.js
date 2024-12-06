@@ -12,7 +12,7 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import {SERVER} from '@env';
+import {SERVER} from 'react-native-dotenv';
 import CustomBtn from '../../components/CustomBtn';
 
 const BizRegisterScreen = ({navigation}) => {

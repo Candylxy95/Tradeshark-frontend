@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   text: {
-    fontFamily: 'Arial',
+    fontFamily: 'Montserrat',
     color: 'black',
     fontSize: 38,
     textAlign: 'left',

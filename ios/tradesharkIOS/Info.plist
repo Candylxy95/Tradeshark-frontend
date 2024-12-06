@@ -48,5 +48,46 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+  <key>UIAppFonts</key>
+  <array>
+    <string>Ionicons.ttf</string>
+    <string>Entypo.ttf</string>
+    <string>EvilIcons.ttf</string>
+    <string>Figtree-Black.ttf</string>
+    <string>Figtree-BlackItalic.ttf</string>
+    <string>Figtree-Bold.ttf</string>
+    <string>Figtree-BoldItalic.ttf</string>
+    <string>Figtree-ExtraBold.ttf</string>
+    <string>Figtree-ExtraBoldItalic.ttf</string>
+    <string>Figtree-Italic.ttf</string>
+    <string>Figtree-Light.ttf</string>
+    <string>Figtree-LightItalic.ttf</string>
+    <string>Figtree-Medium.ttf</string>
+    <string>Figtree-MediumItalic.ttf</string>
+    <string>Figtree-Regular.ttf</string>
+    <string>Figtree-SemiBold.ttf</string>
+    <string>Figtree-SemiBoldItalic.ttf</string>
+    <string>TiltWarp-Regular.ttf</string>
+    <string>BebasNeue_400Regular.ttf</string>
+    <string>Anton_400Regular.ttf</string>
+    <string>Montserrat-Black.ttf</string>
+    <string>Montserrat-BlackItalic.ttf</string>
+    <string>Montserrat-Bold.ttf</string>
+    <string>Montserrat-BoldItalic.ttf</string>
+    <string>Montserrat-ExtraBold.ttf</string>
+    <string>Montserrat-ExtraBoldItalic.ttf</string>
+    <string>Montserrat-ExtraLight.ttf</string>
+    <string>Montserrat-ExtraLightItalic.ttf</string>
+    <string>Montserrat-Italic.ttf</string>
+    <string>Montserrat-Light.ttf</string>
+    <string>Montserrat-LightItalic.ttf</string>
+    <string>Montserrat-Medium.ttf</string>
+    <string>Montserrat-MediumItalic.ttf</string>
+    <string>Montserrat-Regular.ttf</string>
+    <string>Montserrat-SemiBold.ttf</string>
+    <string>Montserrat-SemiBoldItalic.ttf</string>
+    <string>Montserrat-Thin.ttf</string>
+    <string>Montserrat-ThinItalic.ttf</string>
+  </array>
 </dict>
 </plist>

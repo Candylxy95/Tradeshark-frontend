@@ -5,14 +5,14 @@ import {SERVER} from 'react-native-dotenv';
 import UserContext from '../../components/context/UserContext';
 import BottomSheet from '../../components/BottomSheet';
 
-const MarketPlace = ({navigation}) => {
+const PurchasedSignals = ({navigation}) => {
   const [activeListings, setActiveListings] = useState([]);
   const {accessToken} = useContext(UserContext);
   const [showPurchaseCfm, setShowPurchaseCfm] = useState(null);
 
-  const getActiveListings = async () => {
+  const getActivePurchasedListings = async () => {
     try {
-      const res = await fetch(`${SERVER}/listing/active`, {
+      const res = await fetch(`${SERVER}/listing/purchased`, {
         method: 'GET',
         headers: {
           'Content-type': 'application/json',
@@ -21,10 +21,10 @@ const MarketPlace = ({navigation}) => {
       });
 
       if (!res.ok) {
-        throw new Error("Can't get active listing data");
+        throw new Error("Can't get purchased listing list");
       }
       const data = await res.json();
-      console.log(`successfully retrieved active listing data`);
+      console.log(`Successfully retrieved active listing list`);
       console.log(`this is data: ${data.listing}`);
       setActiveListings(data.listing);
     } catch (error) {
@@ -32,39 +32,8 @@ const MarketPlace = ({navigation}) => {
     }
   };
 
-  const purchaseListing = async (sellerId, listingId, price) => {
-    try {
-      const res = await fetch(`${SERVER}/transaction/purchase`, {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-          authorization: 'Bearer ' + accessToken,
-        },
-        body: JSON.stringify({
-          seller_id: sellerId,
-          listing_id: listingId,
-          price: price,
-        }),
-      });
-
-      console.log('Response status:', res.status);
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || 'Failed to purchase listing');
-      }
-      if (res.ok) {
-        setActiveListings(data.listing);
-      } else {
-        console.error('No listings returned in response');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    getActiveListings();
+    getActivePurchasedListings();
   }, []);
 
   return (
@@ -92,7 +61,7 @@ const MarketPlace = ({navigation}) => {
 
           {showPurchaseCfm === listing.id && (
             <BottomSheet
-              btnTitle="Buy"
+              btnTitle="View"
               btnActn={() =>
                 purchaseListing(listing.seller_id, listing.id, listing.price)
               }
@@ -121,4 +90,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MarketPlace;
+export default PurchasedSignals;
