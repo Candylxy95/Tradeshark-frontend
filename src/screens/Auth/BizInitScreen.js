@@ -18,7 +18,7 @@ const BizInitScreen = ({navigation}) => {
           <Text style={styles.brandTitle}>TRADESHARK</Text>
         </View>
         <View style={styles.bizTextContainer}>
-          <Text style={styles.bizText}>BIZ</Text>
+          <Text style={styles.bizText}>Business</Text>
         </View>
       </View>
       <View style={styles.btnContainer}>
@@ -90,14 +90,13 @@ const styles = StyleSheet.create({
   bizTextContainer: {
     position: 'absolute',
     zIndex: 2,
-    bottom: 50,
+    bottom: 30,
     right: 0,
-    transform: [{rotate: '-25deg'}],
   },
   bizText: {
-    fontFamily: 'Montserrat-Black',
-    color: '#FF4A00',
-    fontSize: 40,
+    fontFamily: 'Figtree-regular',
+    color: '#53ACFF',
+    fontSize: 20,
     textAlign: 'right',
     paddingRight: 80,
     zIndex: 2,

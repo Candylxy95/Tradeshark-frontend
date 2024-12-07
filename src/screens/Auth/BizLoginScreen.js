@@ -11,13 +11,12 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-
-import CustomBtn from '../../components/CustomBtn';
 import {SERVER} from 'react-native-dotenv';
+import CustomBtn from '../../components/CustomBtn';
 import UserContext from '../../components/context/UserContext';
+import EncryptedStorage from 'react-native-encrypted-storage';
 
 const BizLoginScreen = ({navigation}) => {
-  //   const navigation = useNavigation();
   const userContext = useContext(UserContext);
   const [loginForm, setLoginForm] = useState({
     email: '' || null,
@@ -38,11 +37,14 @@ const BizLoginScreen = ({navigation}) => {
       });
 
       if (!res.ok) {
-        throw new Error('Failed to login');
+        const error = await res.json();
+        const errorMsg = error.msg;
+        throw new Error('Failed to login: ', errorMsg);
       }
       const data = await res.json();
       console.log('login response:', data);
-      SecureStore.setItemAsync('accessToken', data.access);
+
+      await EncryptedStorage.setItem('accessToken', data.access);
       userContext.setAccessToken(data.access);
       console.log(`Access Data = ${data.access}`);
 
@@ -52,9 +54,10 @@ const BizLoginScreen = ({navigation}) => {
         password: '',
         role: 'ts_seller',
       });
+
       console.log('Login form emptied.');
 
-      navigation.navigate('UserNavigator');
+      navigation.navigate('BizUserNavigator');
     } catch (error) {
       console.error('Login error:', error.message);
       Alert.alert('Login Error', error.message);
@@ -95,7 +98,6 @@ const BizLoginScreen = ({navigation}) => {
           <View>
             <Text style={styles.inputLabel}>Password</Text>
             <TextInput
-              text="password"
               placeholder="Password"
               style={styles.input}
               value={loginForm.password}
@@ -128,7 +130,7 @@ const BizLoginScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F2EB',
+    backgroundColor: '#131314',
     justifyContent: 'space-between',
   },
   imageContainer: {
@@ -150,8 +152,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   text: {
-    fontFamily: 'Arial',
-    color: 'black',
+    fontFamily: 'Figtree-Regular',
+    color: '#F1F2EB',
     fontSize: 38,
     textAlign: 'left',
   },
@@ -168,11 +170,18 @@ const styles = StyleSheet.create({
     gap: '20%',
   },
   input: {
+    color: '#F1F2EB',
     height: 30,
     width: '100%',
     borderBottomWidth: 1,
-    borderColor: 'black',
+    borderColor: '#F1F2EB',
     marginBottom: 15,
+    fontFamily: 'Figtree-LightItalic',
+    placeholderTextColor: '#D8DAD3',
+  },
+  inputLabel: {
+    fontFamily: 'Figtree-Regular',
+    color: '#F1F2EB',
   },
   btnContainer: {
     flex: 4,
@@ -183,17 +192,25 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   btn: {
-    backgroundColor: '#D8DAD3',
+    backgroundColor: 'black',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 25,
     height: 45,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(83, 172, 255, 1)',
+    shadowColor: 'rgba(83, 172, 255, 1)',
+    shadowOpacity: 1,
+    shadowOffset: {width: 0, height: 0},
+    shadowRadius: 15,
+    elevation: 10,
   },
   textStyle: {
-    color: 'black',
+    fontFamily: 'Figtree-Regular',
+    color: '#F1F2EB',
     fontSize: 16,
   },
 });

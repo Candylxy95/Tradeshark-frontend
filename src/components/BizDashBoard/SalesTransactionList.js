@@ -3,15 +3,15 @@ import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import UserContext from '../context/UserContext';
 import {SERVER} from 'react-native-dotenv';
 
-const TransactionList = ({navigation}) => {
+const SalesTransactionList = ({navigation}) => {
   const {accessToken} = useContext(UserContext);
   const [inTransactionData, setInTransactionData] = useState([]);
 
-  const getInTransactionData = async () => {
+  const getSoldListingData = async () => {
     try {
       console.log('Getting internal transactions data');
       console.log('Access: ', accessToken);
-      const res = await fetch(`${SERVER}/transaction/view`, {
+      const res = await fetch(`${SERVER}/transaction/sales`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -20,10 +20,10 @@ const TransactionList = ({navigation}) => {
       });
 
       if (!res.ok) {
-        throw new Error("Can't get internal transactions data");
+        throw new Error("Can't get sold listing data");
       }
       const data = await res.json();
-      console.log(`successfully retrieved intransactions data`);
+      console.log(`successfully retrieved sold listing data`);
       console.log(`this is data: ${data.inTransaction}`);
       setInTransactionData(data.inTransaction);
     } catch (error) {
@@ -32,14 +32,14 @@ const TransactionList = ({navigation}) => {
   };
 
   useEffect(() => {
-    getInTransactionData();
+    getSoldListingData();
   }, []);
 
   return (
     <ScrollView style={styles.transactionList}>
       <View style={styles.transactionRow}>
         <Text style={styles.columnName}>Listing</Text>
-        <Text style={styles.columnName}>Trader</Text>
+        <Text style={styles.columnName}>Bought By</Text>
         <Text style={styles.columnName}>Price</Text>
         <Text style={styles.columnName}>Purchased Date</Text>
       </View>
@@ -51,7 +51,7 @@ const TransactionList = ({navigation}) => {
             {row.ticker}
           </Text>
           <Text style={styles.columnItem}>
-            {row.seller_first_name} {row.seller_last_name[0]}
+            {row.buyer_first_name} {row.buyer_last_name[0]}
           </Text>
           <Text style={styles.columnItem}>S${row.price}</Text>
           <Text style={styles.columnItem}>{row.purchased_date}</Text>
@@ -69,11 +69,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   transactionList: {
-    backgroundColor: '#1E1E1E', // Slightly lighter background for contrast
-    borderRadius: 12, // Rounded corners for the transaction list container
+    backgroundColor: '#1E1E1E',
+    borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 12,
-    shadowColor: '#000', // Subtle shadow for depth
+    shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -131,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TransactionList;
+export default SalesTransactionList;

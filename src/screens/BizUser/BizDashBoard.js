@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useContext} from 'react';
+import React, {useEffect, useState, useContext, useRef} from 'react';
 import {
   View,
   Text,
@@ -6,17 +6,20 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
+import {SERVER} from 'react-native-dotenv';
+import UserContext from '../../components/context/UserContext';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {CommonActions} from '@react-navigation/native';
+import SalesTransactionList from '../../components/BizDashBoard/SalesTransactionList';
 import WalletCard from '../../components/DashBoard/WalletCard';
-import {SERVER} from '@env';
 import CustomBtn from '../../components/CustomBtn';
-import TransactionList from '../../components/DashBoard/TransactionList';
-import SubscriptionList from '../../components/DashBoard/SubscriptionList';
 
 const BizDashBoard = ({navigation}) => {
   const [sellerData, setSellerData] = useState([]);
   const [showTransactionList, setShowTransactionList] = useState(false);
   const [showSubscriptionList, setShowSubscriptionList] = useState(false);
-  const {accessToken} = useContext(UserContext);
+  const {accessToken, setAccessToken} = useContext(UserContext);
 
   const getSellerData = async () => {
     try {
@@ -32,12 +35,32 @@ const BizDashBoard = ({navigation}) => {
       if (!res.ok) {
         throw new Error('Failed to login');
       }
-      console.log(`successfully retrieved user data`);
 
+      console.log(`successfully retrieved user data`);
       const data = await res.json();
       setSellerData(data);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await EncryptedStorage.removeItem('accessToken');
+      setAccessToken('');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 5,
+          routes: [
+            {
+              name: 'AuthNavigator',
+              state: {routes: [{name: 'BizLoginScreen'}]},
+            },
+          ],
+        }),
+      );
+    } catch (error) {
+      console.error('Failed to logout: ', error);
     }
   };
 
@@ -48,8 +71,14 @@ const BizDashBoard = ({navigation}) => {
   return (
     <KeyboardAvoidingView style={styles.container}>
       <View style={{height: '10%'}}></View>
-      <View style={{height: '30%', marginBottom: '2%'}}>
-        <WalletCard balance="200" />
+      <CustomBtn
+        title="Logout"
+        onPress={logout}
+        style={styles.btn}
+        textStyle={styles.btnText}
+      />
+      <View style={styles.walletContainer}>
+        <WalletCard balance={sellerData?.user?.balance} btnTitle="Withdraw" />
       </View>
       <View style={styles.compartment}>
         <Text style={styles.text}>Transactions</Text>
@@ -57,7 +86,13 @@ const BizDashBoard = ({navigation}) => {
         <CustomBtn
           style={styles.btn}
           textStyle={styles.btnText}
-          title={!showTransactionList ? 'View' : 'Hide'}
+          title={
+            !showTransactionList ? (
+              <Icon name="caret-down-circle" size={25} color="#F1F2EB" />
+            ) : (
+              <Icon name="caret-up-circle" size={25} color="#F1F2EB" />
+            )
+          }
           onPress={() =>
             showTransactionList
               ? setShowTransactionList(false)
@@ -67,15 +102,21 @@ const BizDashBoard = ({navigation}) => {
       </View>
       {showTransactionList && (
         <ScrollView style={{height: '30%'}}>
-          <TransactionList />
+          <SalesTransactionList />
         </ScrollView>
       )}
       <View style={styles.compartment}>
-        <Text style={styles.text}>Subscriptions</Text>
+        <Text style={styles.text}>Subscribers</Text>
         <CustomBtn
           style={styles.btn}
           textStyle={styles.btnText}
-          title={!showSubscriptionList ? 'View' : 'Hide'}
+          title={
+            !showSubscriptionList ? (
+              <Icon name="caret-down-circle" size={25} color="#F1F2EB" />
+            ) : (
+              <Icon name="caret-up-circle" size={25} color="#F1F2EB" />
+            )
+          }
           onPress={() =>
             showSubscriptionList
               ? setShowSubscriptionList(false)
@@ -95,33 +136,66 @@ const BizDashBoard = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F2EB',
+    backgroundColor: '#131314',
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
+  walletContainer: {
+    height: '25%',
+    marginBottom: 15,
+    borderRadius: 10,
+    borderTopStartRadius: 40,
+    borderTopEndRadius: 40,
+    backgroundColor: '#1F2124',
+    zIndex: 3,
+  },
+
   compartment: {
-    marginBottom: '2%',
-    height: '20%',
-    position: 'fixed',
+    marginBottom: 15,
+    borderRadius: 10,
+    padding: 20,
+    backgroundColor: '#1F2124',
+    shadowColor: 'rgba(0, 0, 0, 0.8)',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#D8DAD3',
+    height: 90,
   },
   text: {
-    color: 'black',
-    fontFamily: 'Arial',
-    fontSize: 20,
-    paddingBottom: 10,
+    color: '#F1F2EB',
+    fontFamily: 'Figtree-Light',
+    fontSize: 18,
+    textAlign: 'center',
   },
   btn: {
-    backgroundColor: '#415D43',
-    width: 45,
-    borderRadius: 100,
+    backgroundColor: 'black',
+    marginTop: 35,
+    width: 25,
+    height: 25,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 25,
-    height: 45,
+    shadowColor: 'rgba(43, 134, 255, 1)',
+    shadowOpacity: 0.8,
+    shadowOffset: {width: 0, height: 0},
+    shadowRadius: 10,
+    elevation: 5,
   },
-  btnText: {
-    color: '#F1F2EB',
+  scrollContainer: {
+    maxHeight: 200,
+    marginTop: 10,
+    paddingHorizontal: 10,
+    backgroundColor: '#1F2124',
+    borderRadius: 10,
+    shadowColor: 'rgba(0, 0, 0, 0.8)',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
 });
 

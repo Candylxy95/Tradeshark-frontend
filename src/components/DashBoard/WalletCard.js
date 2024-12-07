@@ -1,16 +1,20 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import CustomBtn from '../CustomBtn';
+import {format} from 'date-fns';
 
 const WalletCard = props => {
+  const date = format(new Date(), 'dd MMM yyyy');
+
   return (
     <View style={styles.container}>
+      <Text style={styles.dateText}>{date}</Text>
       <Text style={styles.text}>Balance</Text>
       <Text style={styles.subText}>S$ {props.balance}</Text>
       <CustomBtn
         style={styles.btn}
         textStyle={styles.btnText}
-        title="Deposit"
+        title={props.btnTitle}
       />
     </View>
   );
@@ -19,38 +23,51 @@ const WalletCard = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#D8DAD3',
     justifyContent: 'center',
     alignItems: 'center',
-    width: '100%',
-    borderTopStartRadius: 50,
-    borderTopEndRadius: 50,
+  },
+  dateText: {
+    color: '#F1F2EB',
+    fontFamily: 'Figtree-Medium',
+    fontSize: 12,
+    paddingTop: 35,
   },
   text: {
-    color: 'black',
-    fontFamily: 'Arial',
+    color: '#F1F2EB',
+    fontFamily: 'Figtree-Medium',
     fontSize: 14,
-    paddingTop: 40,
-    paddingBottom: 10,
   },
   subText: {
-    color: 'black',
+    color: '#2B86FF',
     fontFamily: 'Anton',
-    fontSize: 50,
-    paddingBottom: 20,
+    fontSize: 35,
+    paddingBottom: 25,
+    textShadowColor: 'rgba(43, 134, 255, 0.5)',
+    paddingTop: 10,
+    textShadowOffset: {width: 0, height: 0},
+    textShadowRadius: 10,
   },
   btn: {
     backgroundColor: 'black',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 25,
-    height: 45,
+    marginTop: '-15',
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(83, 172, 255, 1)',
+    shadowColor: 'rgba(43, 134, 255, 0.8)',
+    shadowOpacity: 1,
+    shadowOffset: {width: 0, height: 0},
+    shadowRadius: 15,
+    elevation: 10,
   },
   btnText: {
-    color: '#F1F2EB',
+    color: '#F1F2EB', // Matches the overall theme
+    fontSize: 14,
+    fontFamily: 'Figtree-Bold',
   },
 });
 

@@ -11,10 +11,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-// import * as SecureStore from "expo-secure-store";
-// import * as Expo from "expo";
-// import { fetch } from "expo/fetch";
-// import {useNavigation} from '@react-navigation/native';
+
 import {SERVER} from 'react-native-dotenv';
 import CustomBtn from '../../components/CustomBtn';
 import UserContext from '../../components/context/UserContext';
@@ -135,7 +132,7 @@ const LoginScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F2EB',
+    backgroundColor: '#131314',
     justifyContent: 'space-between',
   },
   imageContainer: {
@@ -157,8 +154,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   text: {
-    fontFamily: 'Montserrat',
-    color: 'black',
+    fontFamily: 'Figtree-Regular',
+    color: '#F1F2EB',
     fontSize: 38,
     textAlign: 'left',
   },
@@ -175,11 +172,18 @@ const styles = StyleSheet.create({
     gap: '20%',
   },
   input: {
+    color: '#F1F2EB',
     height: 30,
     width: '100%',
     borderBottomWidth: 1,
-    borderColor: 'black',
+    borderColor: '#F1F2EB',
     marginBottom: 15,
+    fontFamily: 'Figtree-LightItalic',
+    placeholderTextColor: '#D8DAD3',
+  },
+  inputLabel: {
+    fontFamily: 'Figtree-Regular',
+    color: '#F1F2EB',
   },
   btnContainer: {
     flex: 4,
@@ -190,17 +194,25 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   btn: {
-    backgroundColor: '#D8DAD3',
+    backgroundColor: 'black',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 25,
     height: 45,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(83, 172, 255, 1)',
+    shadowColor: 'rgba(83, 172, 255, 1)',
+    shadowOpacity: 1,
+    shadowOffset: {width: 0, height: 0},
+    shadowRadius: 15,
+    elevation: 10,
   },
   textStyle: {
-    color: 'black',
+    fontFamily: 'Figtree-Regular',
+    color: '#F1F2EB',
     fontSize: 16,
   },
 });

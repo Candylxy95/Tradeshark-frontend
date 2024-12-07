@@ -79,14 +79,21 @@ const PurchasedSignals = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F2EB',
-    paddingHorizontal: 10,
+    backgroundColor: '#131314',
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
   filters: {
     height: '10%',
   },
   listingCard: {
-    height: '28%',
+    marginBottom: 2,
+    borderRadius: 15,
+    shadowColor: 'rgba(0, 0, 0, 0.7)',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });
 

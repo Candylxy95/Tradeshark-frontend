@@ -8,10 +8,8 @@ const ListingCard = props => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={{color: '#F1F2EB', backgroundColor: 'yellow'}}>
-            {props.sellerStatus}
-          </Text>
-          <Text style={{color: '#black', fontSize: 14}}>
+          <Text style={styles.sellerStatus}>{props.sellerStatus}</Text>
+          <Text style={styles.sellerName}>
             {props.sellerName} {props.sellerLastName}
           </Text>
         </View>
@@ -30,14 +28,20 @@ const ListingCard = props => {
               {'    '} <Text style={{fontSize: 14}}>{props.rating} </Text>
             </Text>
             <Text>
-              <Icon name="star-outline" size={20} color="black" />
+              <Icon
+                name="star-outline"
+                size={20}
+                color="rgba(83, 172, 255, 1)"
+              />
             </Text>
           </View>
           <View style={{flexDirection: 'column', paddingTop: 10}}>
             <Text style={styles.label}>
               Entry Price: ${props.entryPrice}{' '}
               <Text
-                style={{color: props.position === 'Long' ? 'green' : 'red'}}>
+                style={{
+                  color: props.position === 'Long' ? 'lightgreen' : 'red',
+                }}>
                 {props.position}
               </Text>
             </Text>
@@ -75,22 +79,30 @@ const ListingCard = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 0,
-    backgroundColor: '#F5F6F4',
-    padding: 10,
-    paddingHorizontal: 25,
+    backgroundColor: '#1F2124',
+    padding: 15,
+    paddingHorizontal: 20,
     marginVertical: 10,
-    borderRadius: 40,
-    elevation: 5,
+    borderRadius: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  imageBackground: {
+    width: 50,
+    height: 50,
+    borderRadius: 50 / 2,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#F1F2EB',
   },
   mainContent: {
     flexDirection: 'row',
@@ -102,39 +114,55 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   ticker: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 2,
   },
   label: {
-    fontWeight: '500',
+    fontSize: 14,
+    color: '#BBBBBB',
+    marginBottom: 4,
   },
   btn: {
     backgroundColor: 'black',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 15,
-    height: 35,
-    width: 100,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(83, 172, 255, 1)',
+    shadowColor: 'rgba(83, 172, 255, 1)',
+    shadowOpacity: 1,
+    shadowOffset: {width: 0, height: 0},
+    shadowRadius: 15,
+    elevation: 10,
   },
   btnText: {
     color: '#F1F2EB',
-  },
-  imageBackground: {
-    width: 35,
-    height: 35,
-    borderRadius: 100,
-    overflow: 'hidden',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   dateLabel: {
-    fontSize: 10,
-    fontWeight: '500',
+    fontSize: 12,
+    color: '#BBBBBB',
+    marginBottom: 2,
   },
   date: {
-    fontSize: 10,
+    fontSize: 12,
+    color: '#F1F2EB',
+  },
+  sellerStatus: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: 'rgba(83, 172, 255, 1)',
+    marginBottom: 4,
+  },
+  sellerName: {
+    fontSize: 14,
+    color: '#FFFFFF',
   },
 });
 

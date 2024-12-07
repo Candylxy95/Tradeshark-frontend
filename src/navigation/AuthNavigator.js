@@ -9,6 +9,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import UserNavigator from './UserNavigator';
 import ListingScreen from '../screens/User/ListingScreen';
+import BizUserNavigator from './BizUserNavigator';
+import ListingDetailBoard from '../screens/BizUser/ListingDetailBoard';
 
 const Stack = createStackNavigator();
 
@@ -72,8 +74,23 @@ const AuthNavigator = () => {
           }}
         />
         <Stack.Screen
+          name="BizUserNavigator"
+          component={BizUserNavigator}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="ListingScreen"
           component={ListingScreen}
+          options={{
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="ListingDetail"
+          component={ListingDetailBoard}
           options={{
             headerTransparent: true,
             headerTitle: '',
