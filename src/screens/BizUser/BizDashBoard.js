@@ -14,11 +14,15 @@ import {CommonActions} from '@react-navigation/native';
 import SalesTransactionList from '../../components/BizDashBoard/SalesTransactionList';
 import WalletCard from '../../components/DashBoard/WalletCard';
 import CustomBtn from '../../components/CustomBtn';
+import axios from 'axios';
+import SubscriptionSetupForm from '../../components/BizDashBoard/SubscriptionSetupForm';
+import SubscriberList from '../../components/BizDashBoard/SubscriberList';
 
 const BizDashBoard = ({navigation}) => {
   const [sellerData, setSellerData] = useState([]);
   const [showTransactionList, setShowTransactionList] = useState(false);
   const [showSubscriptionList, setShowSubscriptionList] = useState(false);
+  const [subData, setSubData] = useState([]);
   const {accessToken, setAccessToken} = useContext(UserContext);
 
   const getSellerData = async () => {
@@ -64,71 +68,97 @@ const BizDashBoard = ({navigation}) => {
     }
   };
 
+  const getSubscriptionDataById = async () => {
+    try {
+      const res = await axios.get(`${SERVER}/subscription/`, {
+        headers: {
+          authorization: 'Bearer ' + accessToken,
+        },
+      });
+      console.log('successfully retrieved subscription data');
+      setSubData(res.data.subscription);
+      console.log(res.data.subscription);
+    } catch (error) {
+      console.error('Error:', error.message);
+    }
+  };
+
   useEffect(() => {
     getSellerData();
+    getSubscriptionDataById();
   }, []);
 
   return (
     <KeyboardAvoidingView style={styles.container}>
-      <View style={{height: '10%'}}></View>
-      <CustomBtn
-        title="Logout"
-        onPress={logout}
-        style={styles.btn}
-        textStyle={styles.btnText}
-      />
-      <View style={styles.walletContainer}>
-        <WalletCard balance={sellerData?.user?.balance} btnTitle="Withdraw" />
-      </View>
-      <View style={styles.compartment}>
-        <Text style={styles.text}>Transactions</Text>
+      <ScrollView>
+        <View style={{height: '10%'}}></View>
+        <CustomBtn
+          title="Logout"
+          onPress={logout}
+          style={styles.btn}
+          textStyle={styles.btnText}
+        />
+        <View style={styles.walletContainer}>
+          <WalletCard balance={sellerData?.user?.balance} btnTitle="Withdraw" />
+        </View>
+        <View style={styles.compartment}>
+          <Text style={styles.text}>Transactions</Text>
 
-        <CustomBtn
-          style={styles.btn}
-          textStyle={styles.btnText}
-          title={
-            !showTransactionList ? (
-              <Icon name="caret-down-circle" size={25} color="#F1F2EB" />
-            ) : (
-              <Icon name="caret-up-circle" size={25} color="#F1F2EB" />
-            )
-          }
-          onPress={() =>
-            showTransactionList
-              ? setShowTransactionList(false)
-              : setShowTransactionList(true)
-          }
-        />
-      </View>
-      {showTransactionList && (
-        <ScrollView style={{height: '30%'}}>
-          <SalesTransactionList />
-        </ScrollView>
-      )}
-      <View style={styles.compartment}>
-        <Text style={styles.text}>Subscribers</Text>
-        <CustomBtn
-          style={styles.btn}
-          textStyle={styles.btnText}
-          title={
-            !showSubscriptionList ? (
-              <Icon name="caret-down-circle" size={25} color="#F1F2EB" />
-            ) : (
-              <Icon name="caret-up-circle" size={25} color="#F1F2EB" />
-            )
-          }
-          onPress={() =>
-            showSubscriptionList
-              ? setShowSubscriptionList(false)
-              : setShowSubscriptionList(true)
-          }
-        />
-      </View>
-      {showSubscriptionList && (
-        <ScrollView style={{height: '30%'}}>
-          <SubscriptionList />
-        </ScrollView>
-      )}
+          <CustomBtn
+            style={styles.btn}
+            textStyle={styles.btnText}
+            title={
+              !showTransactionList ? (
+                <Icon name="caret-down-circle" size={25} color="#F1F2EB" />
+              ) : (
+                <Icon name="caret-up-circle" size={25} color="#F1F2EB" />
+              )
+            }
+            onPress={() =>
+              showTransactionList
+                ? setShowTransactionList(false)
+                : setShowTransactionList(true)
+            }
+          />
+        </View>
+        {showTransactionList && (
+          <ScrollView style={{height: '30%'}}>
+            <SalesTransactionList />
+          </ScrollView>
+        )}
+
+        {subData.length > 0 ? (
+          <View style={styles.compartment}>
+            <Text style={styles.text}>Subscribers</Text>
+            <CustomBtn
+              style={styles.btn}
+              textStyle={styles.btnText}
+              title={
+                !showSubscriptionList ? (
+                  <Icon name="caret-down-circle" size={25} color="#F1F2EB" />
+                ) : (
+                  <Icon name="caret-up-circle" size={25} color="#F1F2EB" />
+                )
+              }
+              onPress={() =>
+                showSubscriptionList
+                  ? setShowSubscriptionList(false)
+                  : setShowSubscriptionList(true)
+              }
+            />
+          </View>
+        ) : (
+          <View style={[styles.compartment, styles.subForm]}>
+            <SubscriptionSetupForm />
+          </View>
+        )}
+
+        {showSubscriptionList && (
+          <ScrollView style={{height: '30%'}}>
+            <SubscriberList />
+          </ScrollView>
+        )}
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
@@ -136,7 +166,7 @@ const BizDashBoard = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#131314',
+    backgroundColor: '#white',
     paddingHorizontal: 16,
     paddingTop: 20,
   },
@@ -165,8 +195,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 90,
   },
+  subForm: {
+    height: 200,
+    flex: 0,
+  },
   text: {
-    color: '#F1F2EB',
+    color: 'white',
     fontFamily: 'Figtree-Light',
     fontSize: 18,
     textAlign: 'center',
@@ -196,6 +230,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 5,
+  },
+  btnStart: {
+    backgroundColor: 'black',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: '-15',
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(83, 172, 255, 1)',
+    shadowColor: 'rgba(43, 134, 255, 0.8)',
+    shadowOpacity: 1,
+    shadowOffset: {width: 0, height: 0},
+    shadowRadius: 15,
+    elevation: 10,
+  },
+  btnTextStart: {
+    color: '#F1F2EB', // Matches the overall theme
+    fontSize: 14,
+    fontFamily: 'Figtree-Bold',
   },
 });
 

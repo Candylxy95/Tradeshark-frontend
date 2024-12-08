@@ -1,56 +1,198 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   StyleSheet,
   KeyboardAvoidingView,
   TextInput,
+  Switch,
 } from 'react-native';
 import CustomBtn from './CustomBtn';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {ScrollView} from 'react-native-gesture-handler';
+import AwesomeAlert from 'react-native-awesome-alerts';
 
 const ListingCardExtended = props => {
+  const [isChecked, setIsChecked] = useState(props.sold_as_single_listing);
+  const [showUpdatedAlert, setShowUpdatedAlert] = useState(false);
+  const [showUpdateCfmAlert, setShowUpdateCfmAlert] = useState(false);
+  const [isInputValid, setIsInputValid] = useState(
+    'Please ensure all fields are filled',
+  );
+  const [showInvalidAlert, setShowInvalidAlert] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [openPosition, setOpenPosition] = useState(false);
-  const [positionValue, setPositionValue] = useState(null);
+  const [positionValue, setPositionValue] = useState(props.position);
   const [positionItems, setPositionItems] = useState([
     {label: 'Long', value: 'Long'},
     {label: 'Short', value: 'Short'},
   ]);
+
+  const [durationInput, setDurationInput] = useState({
+    days: props.durationDays || 0,
+    hours: props.durationHours || 0,
+    minutes: props.durationMinutes || 0,
+  });
+
   const [input, setInput] = useState({
     img_src: props.Img || '',
     ticker: props.ticker || '',
-    position: props.position || '',
+    position: positionValue,
     entry_price: props.entryPrice || 0,
     take_profit: props.takeProfit || 0,
     stop_loss: props.stopLoss || 0,
     price: props.price || 0,
     notes: props.notes || '',
+    duration: '',
+    asset_class: props.assetClass,
+    sold_as_single_listing: isChecked,
   });
+
+  const formatDuration = durationInput => {
+    return `${durationInput.days} days, ${durationInput.hours} hours, ${durationInput.minutes} minutes`;
+  };
 
   const handleChange = (text, value) => {
     setInput(prevInput => ({
       ...prevInput,
       [text]: value,
     }));
+    validateInput();
   };
 
-  const handleIntervalChange = value => {
-    setInput(prevInput => ({
+  const handleDurationChange = (text, value) => {
+    setDurationInput(prevInput => ({
       ...prevInput,
-      duration: value === '' ? '1 Day' : value,
+      [text]: value === '' ? 0 : Number(value),
     }));
+    validateInput();
   };
 
   const handleSubmit = () => {
-    props.updateFn(input);
+    if (!validateInput()) {
+      setShowInvalidAlert(true);
+      return;
+    }
+    setShowUpdateCfmAlert(true);
+  };
+
+  const handleSubmitCfm = () => {
+    setShowUpdateCfmAlert(false);
     setIsUpdating(false);
+    props.updateFn(input);
+    setTimeout(() => {
+      setShowUpdatedAlert(true);
+    }, 000);
+  };
+
+  useEffect(() => {
+    setInput(prevInput => ({
+      ...prevInput,
+      duration: formatDuration(durationInput),
+    }));
+  }, [durationInput]);
+
+  useEffect(() => {
+    setInput(prevInput => ({
+      ...prevInput,
+      sold_as_single_listing: isChecked,
+    }));
+  }, [isChecked]);
+
+  const validateInput = () => {
+    const {ticker, asset_class, position, entry_price, take_profit, stop_loss} =
+      input;
+
+    const {days, hours, minutes} = durationInput;
+
+    if (
+      !ticker ||
+      !asset_class ||
+      !position ||
+      days === '' ||
+      hours === '' ||
+      minutes === ''
+    ) {
+      setIsInputValid('Please ensure all fields are filled');
+      return false;
+    }
+    if (Number(days) === 0 && Number(hours) === 0 && Number(minutes) === 0) {
+      setIsInputValid('Please enter a valid trade duration');
+      return false;
+    }
+    if (
+      isNaN(entry_price) ||
+      isNaN(take_profit) ||
+      isNaN(stop_loss) ||
+      isNaN(days) ||
+      isNaN(hours) ||
+      isNaN(days)
+    ) {
+      setIsInputValid('Please ensure time and prices are valid numbers');
+      return false;
+    }
+    setIsInputValid('valid');
+    return true;
   };
 
   return (
     <KeyboardAvoidingView style={styles.container}>
+      <View style={styles.alertContainer}>
+        {showInvalidAlert && (
+          <AwesomeAlert
+            show={showInvalidAlert}
+            showProgress={false}
+            title="Unable to update"
+            message={isInputValid}
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            confirmText="Confirm"
+            confirmButtonColor="#DD6B55"
+            onConfirmPressed={() => {
+              setShowInvalidAlert(false);
+            }}
+          />
+        )}
+        {showUpdateCfmAlert && (
+          <AwesomeAlert
+            show={showUpdateCfmAlert}
+            showProgress={false}
+            title="Update Confirmation"
+            message="Are you sure you want to update? You may only update any listing once."
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            showCancelButton={true}
+            showConfirmButton={true}
+            confirmText="Confirm"
+            cancelText="Cancel"
+            confirmButtonColor="#DD6B55"
+            onConfirmPressed={handleSubmitCfm}
+            onCancelPressed={() => {
+              setShowUpdateCfmAlert(false);
+            }}
+          />
+        )}
+        {showUpdatedAlert && (
+          <AwesomeAlert
+            show={showUpdatedAlert}
+            showProgress={false}
+            title="Update Successful"
+            message="Listing has been successfully updated"
+            closeOnTouchOutside={true}
+            closeOnHardwareBackPress={false}
+            showCancelButton={false}
+            showConfirmButton={true}
+            confirmText="Confirm"
+            confirmButtonColor="#DD6B55"
+            onConfirmPressed={() => {
+              setShowUpdatedAlert(false);
+            }}
+          />
+        )}
+      </View>
+
       <View>{props.Img}</View>
       <View style={styles.sellerBanner}>
         <View style={{alignContent: 'space-between'}}>
@@ -124,18 +266,40 @@ const ListingCardExtended = props => {
         </View>
       </View>
 
-      <View style={{flex: 1, paddingHorizontal: 20}}>
-        <Text>
-          Duration:{' '}
-          {!isUpdating ? (
-            input.duration
-          ) : (
+      <View style={styles.row}>
+        <Text>Duration: </Text>
+        {!isUpdating ? (
+          <View style={styles.durationRow}>
+            {props.durationDays && <Text>{props.durationDays} Days</Text>}
+            {props.durationHours && <Text>{props.durationHours} Hours</Text>}
+            {props.durationMinutes && (
+              <Text>{props.durationMinutes} Minutes</Text>
+            )}
+          </View>
+        ) : (
+          <View style={styles.durationRow}>
             <TextInput
-              value={input.duration}
-              onChangeText={handleIntervalChange}
-            />
-          )}
-        </Text>
+              value={durationInput.days}
+              onChangeText={text => handleDurationChange('days', text)}>
+              {props.durationDays}
+            </TextInput>
+            <Text>Days</Text>
+            <TextInput
+              value={durationInput.hours}
+              onChangeText={text => handleDurationChange('hours', text)}>
+              {props.durationHours}
+            </TextInput>
+            <Text>Hours</Text>
+            <TextInput
+              value={durationInput.minutes}
+              onChangeText={text => handleDurationChange('minutes', text)}>
+              {props.durationMinutes}
+            </TextInput>
+            <Text>Minutes</Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.row}>
         <Text>Risk Reward Ratio: {props.riskRatio}</Text>
       </View>
       <View style={styles.rating}>
@@ -180,6 +344,31 @@ const ListingCardExtended = props => {
             />
           )}
         </Text>
+      </View>
+      <View>
+        {!isUpdating ? (
+          <Text>
+            {isChecked
+              ? 'This listing is available for sale individually'
+              : 'This listing is unavailable for sale individually'}
+          </Text>
+        ) : (
+          <>
+            <Text style={styles.checkboxLabel}>
+              {isChecked
+                ? 'Sold as a single listing'
+                : 'Only available as subscription'}
+            </Text>
+            <Switch
+              value={isChecked}
+              onValueChange={() => {
+                isChecked ? setIsChecked(false) : setIsChecked(true);
+              }}
+              thumbColor={isChecked ? '#4CAF50' : '#f4f3f4'}
+              trackColor={{false: '#767577', true: '#81b0ff'}}
+            />
+          </>
+        )}
       </View>
       <CustomBtn
         title={!isUpdating ? 'Update' : 'Submit'}
@@ -279,6 +468,31 @@ const styles = StyleSheet.create({
     color: '#F1F2EB',
     fontSize: 16,
     fontWeight: '600',
+  },
+  durationRow: {
+    flexDirection: 'row',
+  },
+  row: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    flex: 0.5,
+  },
+  alertContainer: {
+    position: 'absolute',
+    width: '100%',
+    zIndex: 10,
+    top: 0,
+  },
+  dropdown: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    color: 'white',
+  },
+  dropdownContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
 });
 
