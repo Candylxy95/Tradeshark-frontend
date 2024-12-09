@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, ImageBackground} from 'react-native';
+import {View, Text, StyleSheet, ImageBackground, Pressable} from 'react-native';
 import CustomBtn from './CustomBtn';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -8,16 +8,20 @@ const ListingCard = props => {
     <View style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.sellerStatus}>{props.sellerStatus}</Text>
-          <Text style={styles.sellerName}>
-            {props.sellerName} {props.sellerLastName}
-          </Text>
+          <Pressable onPress={props.goSellerProfFn}>
+            <Text style={styles.sellerStatus}>{props.sellerStatus}</Text>
+            <Text style={styles.sellerName}>
+              {props.sellerFirstName} {props.sellerLastName}
+            </Text>
+          </Pressable>
         </View>
-        <ImageBackground
-          source={{uri: props.imgSrc}}
-          style={styles.imageBackground}
-          imageStyle={{borderRadius: 100}}
-        />
+        {props.imgSrc && (
+          <ImageBackground
+            source={{uri: props.imgSrc}}
+            style={styles.imageBackground}
+            imageStyle={{borderRadius: 100}}
+          />
+        )}
       </View>
 
       <View style={styles.mainContent}>
@@ -29,7 +33,7 @@ const ListingCard = props => {
             </Text>
             <Text>
               <Icon
-                name="star-outline"
+                name={props.rating === '0' ? 'star-outline' : 'star'}
                 size={20}
                 color="rgba(83, 172, 255, 1)"
               />
@@ -45,7 +49,7 @@ const ListingCard = props => {
                 {props.position}
               </Text>
             </Text>
-            <Text style={styles.label}>Type: {props.duration}</Text>
+            <Text style={styles.label}>Type: {props.type}</Text>
             <Text style={styles.label}>Ratio: {props.ratio}</Text>
           </View>
         </View>
@@ -67,7 +71,7 @@ const ListingCard = props => {
           <CustomBtn
             style={styles.btn}
             textStyle={styles.btnText}
-            title="Buy +"
+            title={props.btnTitle}
             onPress={props.onPress}
           />
         </View>

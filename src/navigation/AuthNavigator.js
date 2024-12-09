@@ -11,6 +11,8 @@ import UserNavigator from './UserNavigator';
 import ListingScreen from '../screens/User/ListingScreen';
 import BizUserNavigator from './BizUserNavigator';
 import ListingDetailBoard from '../screens/BizUser/ListingDetailBoard';
+import UserListingDetailBoard from '../screens/User/UserListingDetailBoard';
+import UserViewSellerProfile from '../screens/User/UserViewSellerProfile';
 
 const Stack = createStackNavigator();
 
@@ -91,6 +93,22 @@ const AuthNavigator = () => {
         <Stack.Screen
           name="ListingDetail"
           component={ListingDetailBoard}
+          options={{
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="UserListingDetail"
+          component={UserListingDetailBoard}
+          options={{
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="UserViewSellerProfile"
+          component={UserViewSellerProfile}
           options={{
             headerTransparent: true,
             headerTitle: '',

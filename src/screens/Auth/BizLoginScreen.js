@@ -27,7 +27,6 @@ const BizLoginScreen = ({navigation}) => {
 
   const login = async () => {
     try {
-      console.log('Login function called with inputs:');
       const res = await fetch(`${SERVER}/auth/login`, {
         method: 'POST',
         headers: {

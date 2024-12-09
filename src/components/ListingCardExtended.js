@@ -82,7 +82,7 @@ const ListingCardExtended = props => {
     props.updateFn(input);
     setTimeout(() => {
       setShowUpdatedAlert(true);
-    }, 000);
+    }, 1000);
   };
 
   useEffect(() => {
