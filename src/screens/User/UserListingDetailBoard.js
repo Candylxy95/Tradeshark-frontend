@@ -1,18 +1,28 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Text, View, StyleSheet, ActivityIndicator} from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+} from 'react-native';
 import axios from 'axios';
 import {SERVER} from 'react-native-dotenv';
 import UserContext from '../../components/context/UserContext';
 import UserListingCardExtended from '../../components/UserProfile/UserListingCardExtended';
+import ListingHistoryCard from '../../components/ListingHistoryCard';
+import {ScrollView} from 'react-native-gesture-handler';
 
-const ListingDetailBoard = ({route}) => {
+const UserListingDetailBoard = ({route}) => {
   const {accessToken} = useContext(UserContext);
   const [listingDetails, setListingDetails] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [rated, setRated] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [historyDetails, setHistoryDetails] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [listingRatedData, setListingRatedData] = useState([]);
 
   const getListingById = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.get(
         `${SERVER}/listing/${route.params.listingId}`,
@@ -22,7 +32,6 @@ const ListingDetailBoard = ({route}) => {
           },
         },
       );
-      console.log('Response:', res.data);
       setListingDetails(res.data.listing[0]);
       setIsLoading(false);
     } catch (error) {
@@ -30,19 +39,36 @@ const ListingDetailBoard = ({route}) => {
     }
   };
 
-  const rateListing = async () => {
-    setIsSubmitting(true);
+  const getListingHistoryById = async () => {
+    setIsLoading(true);
     try {
-      const res = await axios.post(
-        `${SERVER}/listing/${route.params.listingId}`,
-        {likes: rated},
+      const res = await axios.get(
+        `${SERVER}/listing/history/${route.params.listingId}`,
         {
           headers: {
             authorization: 'Bearer ' + accessToken,
           },
         },
       );
-      console.log('Response Likes: ', res.data.listing.likes);
+      setHistoryDetails([res.data.history]);
+      setIsLoading(false);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const rateListing = async () => {
+    setIsSubmitting(true);
+    try {
+      const res = await axios.get(
+        `${SERVER}/transaction/rated/${route.params.listingId}`,
+        {
+          headers: {
+            authorization: 'Bearer ' + accessToken,
+          },
+        },
+      );
+      setListingRatedData(res.data.rated);
       getListingById();
     } catch (error) {
       console.error(error.message);
@@ -51,24 +77,21 @@ const ListingDetailBoard = ({route}) => {
     }
   };
 
-  const handleSetRate = () => {
-    if (!rated || rated === '-1') {
-      setRated('1');
-    } else if (rated === '1') {
-      setRated('-1');
-    }
-    rateListing();
-  };
+  useEffect(() => {
+    getListingById();
+    getListingHistoryById();
+  }, [route.params.listingId]);
 
   useEffect(() => {
     getListingById();
-  }, [route.params.listingId]);
+    getListingHistoryById();
+  }, []);
 
   return (
-    <View style={styles.listingCard}>
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#00ff00" />
-      ) : (
+    <KeyboardAvoidingView style={styles.listingCard}>
+      <ScrollView contentContainerStyle={styles.ScrollView}>
+        {isLoading && <ActivityIndicator size="large" color="#00ff00" />}
+
         <UserListingCardExtended
           sellerStatus="Beginner"
           sellerName={listingDetails.first_name}
@@ -76,23 +99,56 @@ const ListingDetailBoard = ({route}) => {
           assetClass={listingDetails.asset_class}
           position={listingDetails.position}
           entryPrice={listingDetails.entry_price}
-          postedDate={listingDetails.posted_date}
+          postedDate={
+            historyDetails.length
+              ? historyDetails[0].updated_date
+              : listingDetails.posted_date
+          }
+          postedTime={
+            historyDetails.length
+              ? historyDetails[0].updated_time
+              : listingDetails.posted_time
+          }
+          hasHistory={historyDetails.length > 0}
+          expiryTime={listingDetails.expiry_time}
           expiryDate={listingDetails.expiry_date}
-          durationDays={listingDetails.duration.days}
-          durationHours={listingDetails.duration.hours}
-          durationMins={listingDetails.duration.minutes}
+          durationDays={listingDetails.duration?.days}
+          durationHours={listingDetails.duration?.hours}
+          durationMins={listingDetails.duration?.minutes}
           riskRatio={listingDetails.rr_ratio}
           takeProfit={listingDetails.take_profit}
           stopLoss={listingDetails.stop_loss}
           Rating={listingDetails.likes}
           notes={listingDetails.notes}
           sold_as_single_listing={listingDetails.sold_as_single_listing}
-          updateFn={() => console.log('happy')}
-          handleSetRate={handleSetRate}
-          rated={rated}
+          handleSetRate={rateListing}
+          rated={listingRatedData.rated}
+          isSubmitting={isSubmitting}
         />
-      )}
-    </View>
+
+        {historyDetails.length > 0 && (
+          <View>
+            <Text style={styles.historyLabel}>History</Text>
+            <ListingHistoryCard
+              sellerName={listingDetails.first_name}
+              ticker={historyDetails[0].ticker}
+              assetClass={historyDetails[0].asset_class}
+              position={historyDetails[0].position}
+              entryPrice={historyDetails[0].entry_price}
+              postedDate={historyDetails[0].posted_date}
+              postedTime={historyDetails[0].posted_time}
+              durationDays={historyDetails[0].duration?.days}
+              durationHours={historyDetails[0].duration?.hours}
+              durationMins={historyDetails[0].duration?.minutes}
+              riskRatio={historyDetails[0].rr_ratio}
+              takeProfit={historyDetails[0].take_profit}
+              stopLoss={historyDetails[0].stop_loss}
+              notes={historyDetails[0].notes}
+            />
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -107,7 +163,9 @@ const styles = StyleSheet.create({
   },
   listingCard: {
     flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
 });
 
-export default ListingDetailBoard;
+export default UserListingDetailBoard;

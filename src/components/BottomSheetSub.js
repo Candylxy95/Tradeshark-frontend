@@ -4,13 +4,13 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import CustomBtn from './CustomBtn';
 import LottieView from 'lottie-react-native';
 
-const BottomSheet = props => {
+const BottomSheetSub = props => {
   return (
     <View style={styles.container}>
       <Modal
         animationType="slide"
         transparent={true}
-        visible={props.showPurchaseCfm === props.listing}>
+        visible={props.showPurchaseCfm}>
         <View style={styles.modalContainer}>
           {!props.showPA ? (
             <View style={styles.bottomSheet}>
@@ -30,18 +30,17 @@ const BottomSheet = props => {
               <Text style={styles.listingText}>{props.listingMsg}</Text>
               <View style={styles.details}>
                 <Text style={styles.detailLabel}>
-                  Listing ID:{' '}
-                  <Text style={styles.detailText}>{props.listingId}</Text>
-                </Text>
-                <Text style={styles.detailLabel}>
-                  Ticker:{' '}
-                  <Text style={styles.detailText}>{props.listingTitle}</Text>
-                </Text>
-                <Text style={styles.detailLabel}>
                   Seller:{' '}
                   <Text style={styles.detailText}>
                     {props.listingSellerFN} {props.listingSellerLN}
                   </Text>
+                </Text>
+                <Text style={styles.detailLabel}>
+                  Start:{' '}
+                  <Text style={styles.detailText}>{props.startDate}</Text>
+                </Text>
+                <Text style={styles.detailLabel}>
+                  Ends: <Text style={styles.detailText}>{props.endDate}</Text>
                 </Text>
                 <View style={styles.priceContainer}>
                   <Icon name="pricetag-outline" size={20} color="blue" />
@@ -82,7 +81,7 @@ const BottomSheet = props => {
               <CustomBtn
                 style={styles.actnBtn}
                 textStyle={styles.actnBtnText}
-                title="Go to listing"
+                title="Done"
                 onPress={props.goToBtn}
               />
             </View>
@@ -190,4 +189,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BottomSheet;
+export default BottomSheetSub;

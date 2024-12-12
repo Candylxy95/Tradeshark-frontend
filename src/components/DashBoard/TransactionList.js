@@ -9,8 +9,6 @@ const TransactionList = ({navigation}) => {
 
   const getInTransactionData = async () => {
     try {
-      console.log('Getting internal transactions data');
-      console.log('Access: ', accessToken);
       const res = await fetch(`${SERVER}/transaction/view`, {
         method: 'GET',
         headers: {
@@ -23,8 +21,7 @@ const TransactionList = ({navigation}) => {
         throw new Error("Can't get internal transactions data");
       }
       const data = await res.json();
-      console.log(`successfully retrieved intransactions data`);
-      console.log(`this is data: ${data.inTransaction}`);
+
       setInTransactionData(data.inTransaction);
     } catch (error) {
       console.error(error);
@@ -35,13 +32,13 @@ const TransactionList = ({navigation}) => {
     getInTransactionData();
   }, []);
 
-  return (
+  return inTransactionData.length > 0 ? (
     <ScrollView style={styles.transactionList}>
       <View style={styles.transactionRow}>
         <Text style={styles.columnName}>Listing</Text>
         <Text style={styles.columnName}>Trader</Text>
         <Text style={styles.columnName}>Price</Text>
-        <Text style={styles.columnName}>Purchased Date</Text>
+        <Text style={styles.columnName}>D.O.P</Text>
       </View>
       {inTransactionData.map((row, index) => (
         <View style={styles.transactionRow} key={index}>
@@ -58,6 +55,12 @@ const TransactionList = ({navigation}) => {
         </View>
       ))}
     </ScrollView>
+  ) : (
+    <ScrollView contentContainerStyle={styles.noTransactionContainer}>
+      <Text style={styles.noTransactionText}>
+        No transactions available to show
+      </Text>
+    </ScrollView>
   );
 };
 
@@ -67,13 +70,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
     paddingVertical: 20,
     paddingHorizontal: 16,
+    marginBottom: 15,
   },
   transactionList: {
-    backgroundColor: '#1E1E1E', // Slightly lighter background for contrast
-    borderRadius: 12, // Rounded corners for the transaction list container
+    backgroundColor: '#1E1E1E',
+    borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 12,
-    shadowColor: '#000', // Subtle shadow for depth
+    shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -83,49 +87,51 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#2C2C2C',
   },
   columnName: {
     flex: 1,
-    fontFamily: 'Arial',
-    fontSize: 14,
+    fontFamily: 'Figtree-Bold',
+    fontSize: 12,
     fontWeight: 'bold',
-    color: '#BBBBBB',
+    color: 'rgba(83, 172, 255, 1)',
     textAlign: 'center',
+    textTransform: 'uppercase',
   },
   columnItem: {
     flex: 1,
-    fontFamily: 'Arial',
+    fontFamily: 'Figtree-Regular',
     fontSize: 14,
-    color: '#FFFFFF',
+    color: '#E5E7EB',
     textAlign: 'center',
     paddingVertical: 4,
   },
   btn: {
-    backgroundColor: '#415D43',
+    backgroundColor: '#3ABECF',
     width: 45,
     height: 45,
     borderRadius: 45 / 2,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 25,
-    shadowColor: '#83ACFF',
+    shadowColor: '#60A5FA',
     shadowOpacity: 0.8,
     shadowOffset: {width: 0, height: 0},
     shadowRadius: 10,
     elevation: 5,
   },
   btnText: {
-    color: '#F1F2EB',
+    color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    fontFamily: 'Figtree-Bold',
   },
   text: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#F9FAFB',
+    fontSize: 20,
+    fontFamily: 'Figtree-Bold',
     textAlign: 'center',
     marginBottom: 16,
   },

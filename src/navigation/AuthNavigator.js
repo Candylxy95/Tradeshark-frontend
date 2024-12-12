@@ -7,12 +7,15 @@ import BizRegisterScreen from '../screens/Auth/BizRegisterScreen';
 import BizLoginScreen from '../screens/Auth/BizLoginScreen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import UserNavigator from './UserNavigator';
-import ListingScreen from '../screens/User/ListingScreen';
 import BizUserNavigator from './BizUserNavigator';
 import ListingDetailBoard from '../screens/BizUser/ListingDetailBoard';
 import UserListingDetailBoard from '../screens/User/UserListingDetailBoard';
 import UserViewSellerProfile from '../screens/User/UserViewSellerProfile';
+import FilterNavigators from './SignalFilterNavigator';
+import ProfileEditScreen from '../screens/User/UserProfile';
+import UserNavigator from './UserNavigator';
+import Payment from '../screens/User/Payment';
+import Payout from '../screens/BizUser/Payout';
 
 const Stack = createStackNavigator();
 
@@ -29,7 +32,7 @@ const AuthNavigator = () => {
           }}
         />
         <Stack.Screen
-          name="RegisterScreen"
+          name="Register"
           component={RegisterScreen}
           options={{
             headerTransparent: true,
@@ -37,7 +40,7 @@ const AuthNavigator = () => {
           }}
         />
         <Stack.Screen
-          name="LoginScreen"
+          name="Login"
           component={LoginScreen}
           options={{
             headerTransparent: true,
@@ -73,6 +76,7 @@ const AuthNavigator = () => {
           component={UserNavigator}
           options={{
             headerShown: false,
+            headerTitle: '',
           }}
         />
         <Stack.Screen
@@ -80,16 +84,10 @@ const AuthNavigator = () => {
           component={BizUserNavigator}
           options={{
             headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="ListingScreen"
-          component={ListingScreen}
-          options={{
-            headerTransparent: true,
             headerTitle: '',
           }}
         />
+
         <Stack.Screen
           name="ListingDetail"
           component={ListingDetailBoard}
@@ -109,6 +107,38 @@ const AuthNavigator = () => {
         <Stack.Screen
           name="UserViewSellerProfile"
           component={UserViewSellerProfile}
+          options={{
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="FilterNavigators"
+          component={FilterNavigators}
+          options={{
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="EditProfile"
+          component={ProfileEditScreen}
+          options={{
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="Payment"
+          component={Payment}
+          options={{
+            headerTransparent: true,
+            headerTitle: '',
+          }}
+        />
+        <Stack.Screen
+          name="Payout"
+          component={Payout}
           options={{
             headerTransparent: true,
             headerTitle: '',

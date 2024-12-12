@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import CustomBtn from '../../components/CustomBtn';
 import {SERVER} from 'react-native-dotenv';
+import axios from 'axios';
 
 const RegisterScreen = ({navigation}) => {
   const [isPasswordMatch, setIsPasswordMatch] = useState(false);
@@ -28,35 +29,24 @@ const RegisterScreen = ({navigation}) => {
   });
 
   const signUp = async inputs => {
-    console.log('SignUp function called with inputs:', inputs);
-    const res = await fetch(`${SERVER}/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(inputs),
-    });
+    try {
+      const res = await axios.post(`${SERVER}/auth/register`, inputs);
 
-    if (!res.ok) {
-      throw new Error('Failed to register');
+      setSignUpForm({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone_number: '',
+        password: '',
+        role: 'ts_buyer',
+      });
+
+      setPasswordCheck('');
+      setIsPasswordMatch(false);
+      navigation.navigate('Login');
+    } catch (error) {
+      Alert.alert(error.message);
     }
-
-    setSignUpForm({
-      first_name: '',
-      last_name: '',
-      email: '',
-      phone_number: '',
-      password: '',
-      role: 'ts_buyer',
-    }),
-      setPasswordCheck(''),
-      setIsPasswordMatch(false),
-      console
-        .log(`password check: ${passwordCheck}, pass match: ${isPasswordMatch}`)
-
-        .catch(error => {
-          console.error(error);
-        });
   };
 
   const handleChange = (text, value) => {
@@ -89,7 +79,6 @@ const RegisterScreen = ({navigation}) => {
         <View style={styles.inputForm}>
           <View style={styles.nameInput}>
             <View style={{width: '90%'}}>
-              <Text style={styles.inputLabel}>First Name</Text>
               <TextInput
                 placeholder="First Name"
                 style={styles.input}
@@ -97,10 +86,10 @@ const RegisterScreen = ({navigation}) => {
                 onChangeText={text => {
                   handleChange('first_name', text);
                 }}
+                placeholderTextColor="#ADADAD"
               />
             </View>
             <View style={{width: '90%'}}>
-              <Text style={styles.inputLabel}>Last Name</Text>
               <TextInput
                 placeholder="Last Name"
                 style={styles.input}
@@ -108,11 +97,11 @@ const RegisterScreen = ({navigation}) => {
                 onChangeText={text => {
                   handleChange('last_name', text);
                 }}
+                placeholderTextColor="#ADADAD"
               />
             </View>
           </View>
           <View>
-            <Text style={styles.inputLabel}>Email Address</Text>
             <TextInput
               placeholder="Email"
               style={styles.input}
@@ -120,10 +109,10 @@ const RegisterScreen = ({navigation}) => {
               onChangeText={text => {
                 handleChange('email', text);
               }}
+              placeholderTextColor="#ADADAD"
             />
           </View>
           <View>
-            <Text style={styles.inputLabel}>Phone Number</Text>
             <TextInput
               placeholder="Phone"
               style={styles.input}
@@ -131,10 +120,10 @@ const RegisterScreen = ({navigation}) => {
               onChangeText={text => {
                 handleChange('phone_number', text);
               }}
+              placeholderTextColor="#ADADAD"
             />
           </View>
           <View>
-            <Text style={styles.inputLabel}>Password</Text>
             <TextInput
               text="password"
               placeholder="Password"
@@ -144,16 +133,17 @@ const RegisterScreen = ({navigation}) => {
               onChangeText={text => {
                 handleChange('password', text);
               }}
+              placeholderTextColor="#ADADAD"
             />
           </View>
           <View>
-            <Text style={styles.inputLabel}>Confirm Password</Text>
             <TextInput
               placeholder="Confirm Password"
               style={styles.input}
               value={passwordCheck}
               secureTextEntry={true}
               onChangeText={text => handleConfirmPassword(text)}
+              placeholderTextColor="#ADADAD"
             />
           </View>
         </View>
@@ -163,16 +153,12 @@ const RegisterScreen = ({navigation}) => {
             textStyle={styles.textStyle}
             title="Sign up"
             onPress={() => {
-              console.log('Button pressed');
-              console.log('SERVER:', SERVER);
-
               if (isPasswordMatch) {
                 signUp(signUpForm);
               } else {
                 Alert.alert(
                   'Password Mismatch',
                   'Please ensure your passwords match before signing up.',
-                  [{text: 'OK', onPress: () => console.log('OK Pressed')}],
                 );
               }
             }}
@@ -187,7 +173,7 @@ const RegisterScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F1F2EB',
+    backgroundColor: '#131314',
     justifyContent: 'space-between',
   },
   imageContainer: {
@@ -199,61 +185,87 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    paddingHorizontal: 20,
   },
   textContainer: {
     flex: 1,
     height: 'auto',
-    width: 'auto',
-    justifyContent: 'flex-start',
-    paddingLeft: 40,
-    paddingTop: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
   },
   text: {
-    fontFamily: 'Arial',
-    color: 'black',
-    fontSize: 38,
-    textAlign: 'left',
+    fontFamily: 'Figtree-Bold',
+    color: '#F1F2EB',
+    fontSize: 32,
+    textAlign: 'center',
   },
+
   inputForm: {
-    flex: 3,
-    paddingLeft: 40,
-    paddingRight: 40,
-    paddingTop: 40,
-    justifyContent: 'flex-start',
+    paddingVertical: 20,
   },
   nameInput: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
     width: '50%',
-    gap: '20%',
+    gap: 30,
   },
   input: {
-    height: 30,
+    height: 50,
     width: '100%',
-    borderBottomWidth: 1,
-    borderColor: 'black',
+    backgroundColor: '#1F2124',
+    borderWidth: 1,
+    borderColor: '#3ABECF',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    fontSize: 16,
     marginBottom: 15,
+    color: '#F1F2EB',
+  },
+  inputLabel: {
+    fontFamily: 'Figtree-Regular',
+    color: '#F1F2EB',
+    fontSize: 14,
+    marginBottom: 5,
   },
   btnContainer: {
     flex: 4,
     height: 'auto',
     width: 'auto',
     paddingHorizontal: 80,
-    paddingTop: 80,
-    justifyContent: 'flex-start',
   },
   btn: {
-    backgroundColor: '#D8DAD3',
+    backgroundColor: 'black',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 25,
     height: 45,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: 'rgba(83, 172, 255, 1)',
+    shadowColor: '#3ABECF',
+    shadowOpacity: 1,
+    shadowOffset: {width: 0, height: 0},
+    shadowRadius: 15,
   },
   textStyle: {
-    color: 'black',
+    color: '#FFFFFF',
     fontSize: 16,
+    fontFamily: 'Figtree-Bold',
+  },
+  linkContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  linkText: {
+    fontFamily: 'Figtree-Regular',
+    color: '#3B82F6',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+    marginLeft: 5,
   },
 });
 

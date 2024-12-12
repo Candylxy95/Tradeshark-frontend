@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState, useEffect, useContext, useCallback} from 'react';
 import {View, StyleSheet, KeyboardAvoidingView, ScrollView} from 'react-native';
 import ListingCard from '../../components/ListingCard';
 import {SERVER} from 'react-native-dotenv';
@@ -6,6 +6,7 @@ import UserContext from '../../components/context/UserContext';
 import BottomSheet from '../../components/BottomSheet';
 import axios from 'axios';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import {useFocusEffect} from '@react-navigation/native';
 
 const MarketPlace = ({navigation}) => {
   const [activeListings, setActiveListings] = useState([]);
@@ -14,6 +15,8 @@ const MarketPlace = ({navigation}) => {
   const [errorCtnr, setErrorCtnr] = useState('');
   const [showPurchaseCfm, setShowPurchaseCfm] = useState(null);
   const [showPA, setShowPA] = useState(false);
+  const [purchasedListings, setPurchasedListings] = useState([]);
+  const [subscribedListings, setSubscribedListings] = useState([]);
 
   const getActiveListings = async () => {
     try {
@@ -24,6 +27,7 @@ const MarketPlace = ({navigation}) => {
       });
 
       setActiveListings(res.data.listing);
+      console.log(`active listings${JSON.stringify(activeListings)}`);
     } catch (error) {
       console.error(error);
     }
@@ -52,9 +56,48 @@ const MarketPlace = ({navigation}) => {
     }
   };
 
-  useEffect(() => {
-    getActiveListings();
-  }, []);
+  //view purchased listings - internal transactions
+  const getPurchasedListing = async () => {
+    try {
+      const res = await axios.get(`${SERVER}/listing/purchased`, {
+        headers: {
+          authorization: 'Bearer ' + accessToken,
+        },
+      });
+      setPurchasedListings(res.data.listing);
+      console.log('so' + JSON.stringify(res.data.listing));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const getSubscribedListing = async () => {
+    try {
+      const res = await axios.get(`${SERVER}/subscription/subs`, {
+        headers: {
+          authorization: 'Bearer ' + accessToken,
+        },
+      });
+      setSubscribedListings(res.data.sublisting);
+      console.log('subs' + JSON.stringify(res.data.sublisting));
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  // useEffect(() => {
+  //   getPurchasedListing();
+  //   getSubscribedListing();
+  //   getActiveListings();
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      getPurchasedListing();
+      getSubscribedListing();
+      getActiveListings();
+    }, []),
+  );
 
   return (
     <KeyboardAvoidingView style={styles.container}>
@@ -82,21 +125,25 @@ const MarketPlace = ({navigation}) => {
         {activeListings.map(listing => (
           <View style={styles.listingCard} key={listing.id}>
             <ListingCard
-              onPress={() => {
-                console.log(`this is listincgcard btn ; ${listing.id}`);
-                setShowPurchaseCfm(listing.id);
-              }}
-              imgSrc="https://cdn.midjourney.com/a7a7b6e6-92fb-4471-9889-8982211def99/0_0.png"
+              onPress={() =>
+                purchasedListings.some(
+                  list => String(list.id) === String(listing.id),
+                ) ||
+                subscribedListings.some(
+                  list => String(list.id) === String(listing.id),
+                )
+                  ? navigation.navigate('UserListingDetail', {
+                      listingId: listing.id,
+                    })
+                  : setShowPurchaseCfm(listing.id)
+              }
+              imgSrc="https://cdn.midjourney.com/972aec0b-b06d-4967-8437-aef445e5b90b/0_1.png"
               goSellerProfFn={() => {
-                console.log(
-                  'Navigating to Seller Profile with ID:',
-                  listing.seller_id,
-                );
                 navigation.navigate('UserViewSellerProfile', {
                   sellerId: listing.seller_id,
                 });
               }}
-              sellerStatus="Star Seller"
+              sellerStatus="Beginner"
               sellerFirstName={listing.first_name}
               sellerLastName={listing.last_name[0]}
               ticker={listing.ticker}
@@ -105,26 +152,34 @@ const MarketPlace = ({navigation}) => {
               postedDate={listing.posted_date}
               postedTime={listing.posted_time}
               expiryDate={listing.expiry_date}
-              expiryTime={listing.expiryTime}
+              expiryTime={listing.expiry_time}
               ratio={listing.rr_ratio}
               type={
-                listing.duration.days
+                listing.duration.days >= 1
                   ? 'Long Term'
-                  : listing.duration.hours
+                  : listing.duration.hours >= 1
                   ? 'Mid Term'
-                  : listing.duration.minutes
+                  : listing.duration.minutes >= 1
                   ? 'Short Term'
                   : 'Short Term'
               }
               rating={listing.likes}
-              btnTitle={`S$${listing.price}`}
+              btnTitle={
+                purchasedListings.some(
+                  list => String(list.id) === String(listing.id),
+                ) ||
+                subscribedListings.some(
+                  list => String(list.id) === String(listing.id),
+                )
+                  ? 'View'
+                  : `S$${listing.price}`
+              }
             />
             {showPurchaseCfm === listing.id && (
               <View style={styles.btmSheetContainer}>
                 <BottomSheet
                   btnTitle="Buy"
                   btnActn={() => {
-                    console.log(`this is id= ${listing.id}`);
                     purchaseListing(listing.seller_id, listing.id);
                   }}
                   onPress={() => {

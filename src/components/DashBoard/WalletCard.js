@@ -12,9 +12,10 @@ const WalletCard = props => {
       <Text style={styles.text}>Balance</Text>
       <Text style={styles.subText}>S$ {props.balance}</Text>
       <CustomBtn
-        style={styles.btn}
-        textStyle={styles.btnText}
+        style={props.walletBtn}
+        textStyle={props.walletBtnText}
         title={props.btnTitle}
+        onPress={props.onPress}
       />
     </View>
   );
@@ -38,7 +39,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   subText: {
-    color: '#2B86FF',
+    color: '#3ABECF',
     fontFamily: 'Anton',
     fontSize: 35,
     paddingBottom: 25,
@@ -46,28 +47,6 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     textShadowOffset: {width: 0, height: 0},
     textShadowRadius: 10,
-  },
-  btn: {
-    backgroundColor: 'black',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: '-15',
-    borderRadius: 25,
-    borderWidth: 2,
-    borderColor: 'rgba(83, 172, 255, 1)',
-    shadowColor: 'rgba(43, 134, 255, 0.8)',
-    shadowOpacity: 1,
-    shadowOffset: {width: 0, height: 0},
-    shadowRadius: 15,
-    elevation: 10,
-  },
-  btnText: {
-    color: '#F1F2EB', // Matches the overall theme
-    fontSize: 14,
-    fontFamily: 'Figtree-Bold',
   },
 });
 

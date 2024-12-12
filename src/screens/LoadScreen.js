@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   gif: {
-    position: 'absolute', // Makes the GIF cover the entire background
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,

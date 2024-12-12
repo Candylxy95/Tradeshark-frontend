@@ -16,6 +16,7 @@ import {SERVER} from 'react-native-dotenv';
 import CustomBtn from '../../components/CustomBtn';
 import UserContext from '../../components/context/UserContext';
 import EncryptedStorage from 'react-native-encrypted-storage';
+import {CommonActions} from '@react-navigation/native';
 
 const LoginScreen = ({navigation}) => {
   const userContext = useContext(UserContext);
@@ -28,7 +29,6 @@ const LoginScreen = ({navigation}) => {
 
   const login = async () => {
     try {
-      console.log('Login function called with inputs:');
       const res = await fetch(`${SERVER}/auth/login`, {
         method: 'POST',
         headers: {
@@ -38,16 +38,13 @@ const LoginScreen = ({navigation}) => {
       });
 
       if (!res.ok) {
-        const error = await res.json();
-        const errorMsg = error.msg;
-        throw new Error('Failed to login: ', errorMsg);
+        const errorData = await res.json();
+        throw new Error(errorData.msg || 'Login failed');
       }
       const data = await res.json();
-      console.log('login response:', data);
 
       await EncryptedStorage.setItem('accessToken', data.access);
       userContext.setAccessToken(data.access);
-      console.log(`Access Data = ${data.access}`);
 
       setLoginForm({
         email: '',
@@ -55,12 +52,13 @@ const LoginScreen = ({navigation}) => {
         password: '',
         role: 'ts_buyer',
       });
-
-      console.log('Login form emptied.');
-
-      navigation.navigate('UserNavigator');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'UserNavigator'}],
+        }),
+      );
     } catch (error) {
-      console.error('Login error:', error.message);
       Alert.alert('Login Error', error.message);
     }
   };
@@ -116,9 +114,6 @@ const LoginScreen = ({navigation}) => {
             textStyle={styles.textStyle}
             title="Login"
             onPress={() => {
-              console.log('Button pressed');
-              console.log('SERVER:', SERVER);
-              console.log('form data,', loginForm);
               login(loginForm);
             }}
           />
@@ -144,76 +139,67 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    paddingHorizontal: 20,
   },
   textContainer: {
     flex: 1,
     height: 'auto',
-    width: 'auto',
-    justifyContent: 'flex-start',
-    paddingLeft: 40,
-    paddingTop: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
   },
   text: {
-    fontFamily: 'Figtree-Regular',
+    fontFamily: 'Figtree-Bold',
     color: '#F1F2EB',
-    fontSize: 38,
-    textAlign: 'left',
+    fontSize: 32,
+    textAlign: 'center',
   },
   inputForm: {
-    flex: 3,
-    paddingLeft: 40,
-    paddingRight: 40,
-    paddingTop: 40,
-    justifyContent: 'flex-start',
-  },
-  nameInput: {
-    flexDirection: 'row',
-    width: '50%',
-    gap: '20%',
+    paddingVertical: 20,
   },
   input: {
-    color: '#F1F2EB',
-    height: 30,
+    height: 50,
     width: '100%',
-    borderBottomWidth: 1,
-    borderColor: '#F1F2EB',
+    backgroundColor: '#1F2124',
+    borderWidth: 1,
+    borderColor: '#3ABECF',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    fontSize: 16,
     marginBottom: 15,
-    fontFamily: 'Figtree-LightItalic',
-    placeholderTextColor: '#D8DAD3',
+    color: '#F1F2EB',
   },
   inputLabel: {
     fontFamily: 'Figtree-Regular',
     color: '#F1F2EB',
+    fontSize: 14,
+    marginBottom: 5,
   },
   btnContainer: {
     flex: 4,
     height: 'auto',
     width: 'auto',
     paddingHorizontal: 80,
-    paddingTop: 80,
-    justifyContent: 'flex-start',
   },
   btn: {
-    backgroundColor: 'black',
+    backgroundColor: '#131314',
     paddingVertical: 10,
     paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 25,
     height: 45,
     borderRadius: 25,
     borderWidth: 2,
     borderColor: 'rgba(83, 172, 255, 1)',
-    shadowColor: 'rgba(83, 172, 255, 1)',
+    shadowColor: '#3ABECF',
     shadowOpacity: 1,
     shadowOffset: {width: 0, height: 0},
     shadowRadius: 15,
-    elevation: 10,
   },
   textStyle: {
-    fontFamily: 'Figtree-Regular',
-    color: '#F1F2EB',
+    color: '#FFFFFF',
     fontSize: 16,
+    fontFamily: 'Figtree-Bold',
   },
 });
 

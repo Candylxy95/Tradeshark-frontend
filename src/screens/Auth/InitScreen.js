@@ -23,13 +23,13 @@ const InitScreen = ({navigation}) => {
           style={styles.btn}
           textStyle={styles.textStyle}
           title="Login"
-          onPress={() => navigation.navigate('LoginScreen')}
+          onPress={() => navigation.navigate('Login')}
         />
         <CustomBtn
           style={styles.btn}
           textStyle={styles.textStyle}
           title="Signup"
-          onPress={() => navigation.navigate('RegisterScreen')}
+          onPress={() => navigation.navigate('Register')}
         />
         <TouchableOpacity
           style={styles.linkContainer}

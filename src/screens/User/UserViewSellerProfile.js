@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState, useCallback} from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Image,
   KeyboardAvoidingView,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
 import UserContext from '../../components/context/UserContext';
@@ -14,6 +15,9 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {SERVER} from 'react-native-dotenv';
 import Reviews from '../../components/UserProfile/Reviews';
 import ReviewForm from '../../components/UserProfile/ReviewForm';
+import AwesomeAlert from 'react-native-awesome-alerts';
+import BottomSheetSub from '../../components/BottomSheetSub';
+import {useFocusEffect} from '@react-navigation/native';
 
 const UserViewSellerProfile = ({route, navigation}) => {
   const {accessToken} = useContext(UserContext);
@@ -24,18 +28,30 @@ const UserViewSellerProfile = ({route, navigation}) => {
   const [userSubscriptionToSeller, setUserSubscriptionToSeller] = useState([]);
   const [sellerSubscription, setSellerSubscription] = useState([]);
   const [showReviewBtn, setShowReviewBtn] = useState(true);
+  const [sellerSubCount, setSellerSubCount] = useState([]);
+  const [showPurchaseCfm, setShowPurchaseCfm] = useState(false);
+  const [showPA, setShowPA] = useState(false);
+  const [errorCtnr, setErrorCtnr] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getSellerProfile = async () => {
+    setIsLoading(true);
     try {
       const res = await axios.get(`${SERVER}/user/${route.params.sellerId}`, {
         headers: {
           authorization: 'Bearer ' + accessToken,
         },
       });
-      setProfileData(res.data.profile);
-      console.log(`This is seller data : ${JSON.stringify(res.data.profile)}`);
+      if (res.data.profile) {
+        setProfileData(res.data.profile);
+      } else {
+        console.warn('No profile data received');
+      }
     } catch (error) {
-      console.error(error.message);
+      console.error('Error fetching profile data:', error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
   // has seller set up? with params id
@@ -50,9 +66,6 @@ const UserViewSellerProfile = ({route, navigation}) => {
         },
       );
       setSellerSubscription(res.data.subscription);
-      console.log(
-        `This is subscription data : ${JSON.stringify(res.data.subscription)}`,
-      );
     } catch (error) {
       console.error(error.message);
     }
@@ -68,10 +81,7 @@ const UserViewSellerProfile = ({route, navigation}) => {
           },
         },
       );
-      setUserSubscriptionToSeller(res.data.subscription);
-      console.log(
-        `This is subscription data : ${JSON.stringify(res.data.subscription)}`,
-      );
+      setUserSubscriptionToSeller([res.data.subTransaction]);
     } catch (error) {
       console.error(error.message);
     }
@@ -88,10 +98,12 @@ const UserViewSellerProfile = ({route, navigation}) => {
           },
         },
       );
-      console.log(`Purchase successful ${JSON.stringify(res.data)}`);
+      setShowPA(true);
       getUserSubscription();
     } catch (error) {
       console.error(error.message);
+      setErrorCtnr(error.message);
+      setShowAlert(true);
     }
   };
 
@@ -103,7 +115,19 @@ const UserViewSellerProfile = ({route, navigation}) => {
         },
       });
       setReviewData(res.data.review);
-      console.log(`This is reviews: ${JSON.stringify(res.data.review)}`);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  const getSellerSubCount = async () => {
+    try {
+      const res = await axios.get(`${SERVER}/subscription/count`, {
+        header: {
+          authorization: 'Bearer ' + accessToken,
+        },
+      });
+      setSellerSubCount(res.data.count);
     } catch (error) {
       console.error(error.message);
     }
@@ -112,60 +136,86 @@ const UserViewSellerProfile = ({route, navigation}) => {
   //has user reviewed?
   const getReviewsByUserId = async () => {
     try {
-      const res = await axios.get(`${SERVER}/review/`, {
+      const res = await axios.get(`${SERVER}/review/${route.params.sellerId}`, {
         headers: {
           authorization: 'Bearer ' + accessToken,
         },
       });
-      setUserReviewed([res.data.review]);
-      console.log(`I have reviewed: ${JSON.stringify(res.data.review)}`);
+      setUserReviewed(res.data.review);
     } catch (error) {
       console.error(error.message);
     }
   };
 
   useEffect(() => {
-    getSellerProfile();
-    getReviews();
-    getUserSubscription();
-    getSellerSubscription();
-    getReviewsByUserId();
-    console.log('Route Params:', route.params);
-  }, []);
+    const fetchData = async () => {
+      await getSellerProfile();
+      await getReviews();
+      await getUserSubscription();
+      await getSellerSubscription();
+      await getReviewsByUserId();
+      await getSellerSubCount();
+    };
 
-  useEffect(() => {
-    console.log('UserReviewed:', userReviewed);
-  }, [userReviewed]);
+    fetchData();
+  }, [route.params.sellerId]);
 
   return (
-    <KeyboardAvoidingView style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {isLoading && <ActivityIndicator size="large" color="#00ff00" />}
+
+        <View style={{flex: 1}}>
+          {showAlert && (
+            <AwesomeAlert
+              show={showAlert}
+              showProgress={false}
+              title="Unable to subscribe"
+              message={errorCtnr}
+              closeOnTouchOutside={true}
+              closeOnHardwareBackPress={false}
+              showCancelButton={false}
+              showConfirmButton={true}
+              confirmText="Confirm"
+              confirmButtonColor="#DD6B55"
+              onConfirmPressed={() => {
+                setShowAlert(false);
+              }}
+            />
+          )}
+        </View>
         <View style={styles.profileContainer}>
           <Image
             source={{uri: profileData?.profile_img}}
             style={styles.profileImage}
           />
-          <Text style={styles.name}>
-            {/* {profileData.first_name} {profileData.last_name[0]} */}
-          </Text>
+          {profileData ? (
+            <Text style={styles.name}>{profileData.first_name}</Text>
+          ) : (
+            <Text style={styles.name}></Text>
+          )}
           <Text style={styles.bio}>{profileData?.bio}</Text>
         </View>
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Subscribers</Text>
-            <Text style={styles.statValue}>123</Text>
+            <Text style={styles.statValue}>
+              {sellerSubCount ? 0 : sellerSubCount}
+            </Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Win Rate</Text>
-            <Text style={styles.statValue}>75%</Text>
+            <Text style={styles.statValue}>-%</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Trades</Text>
-            <Text style={styles.statValue}>Forex</Text>
+            <Text style={styles.statValue}>Stock</Text>
           </View>
         </View>
 
-        {!userSubscriptionToSeller && sellerSubscription ? (
+        {userSubscriptionToSeller.length === 0 && sellerSubscription ? (
           <CustomBtn
             style={styles.editProfileBtn}
             textStyle={styles.editProfileBtnText}
@@ -175,9 +225,9 @@ const UserViewSellerProfile = ({route, navigation}) => {
                 Subscribe{' '}
               </Text>
             }
-            onPress={() => purchaseSubscription()}
+            onPress={() => setShowPurchaseCfm(true)}
           />
-        ) : userSubscriptionToSeller && sellerSubscription ? (
+        ) : userSubscriptionToSeller.length > 0 && sellerSubscription ? (
           userReviewed.length === 0 &&
           showReviewBtn && (
             <CustomBtn
@@ -196,7 +246,7 @@ const UserViewSellerProfile = ({route, navigation}) => {
             />
           )
         ) : (
-          <Text>xxx has yet to offer subscription.</Text>
+          <Text>User has yet to offer subscription.</Text>
         )}
 
         {showReviewForm && (
@@ -226,17 +276,49 @@ const UserViewSellerProfile = ({route, navigation}) => {
             />
           )}
 
-          {reviewData.map(rev => (
-            <Reviews
-              key={`${rev.buyer_id}-${rev.seller_id}`}
-              rating={rev.rating}
-              comment={rev.comment}
-              firstName={rev.first_name}
-              lastName={rev.last_name[0]}
-              title={rev.title}
-            />
-          ))}
+          {reviewData.length > 0 ? (
+            reviewData.map(rev => (
+              <Reviews
+                key={`${rev.buyer_id}-${rev.seller_id}`}
+                rating={rev.rating}
+                comment={rev.comment}
+                firstName={rev.first_name}
+                lastName={rev.last_name[0]}
+                title={rev.title}
+              />
+            ))
+          ) : (
+            <Text>This user does not have any reviews.</Text>
+          )}
         </View>
+
+        {showPurchaseCfm && (
+          <View style={styles.btmSheetContainer}>
+            <BottomSheetSub
+              btnTitle="Buy"
+              btnActn={() => {
+                purchaseSubscription();
+              }}
+              onPress={() => {
+                setShowPurchaseCfm(false);
+              }}
+              showPurchaseCfm={showPurchaseCfm}
+              listing={true}
+              title="Subscription Payment"
+              listingMsg={`Subscribe to ${sellerSubscription.first_name}'s Trading Signals`}
+              listingPrice={`${sellerSubscription.price} / Month`}
+              listingSellerFN={sellerSubscription.first_name}
+              listingSellerLN={sellerSubscription.last_name}
+              startDate={sellerSubscription.purchase_date}
+              endDate={sellerSubscription.expiry_Date}
+              showPA={showPA}
+              goToBtn={() => {
+                setShowPA(false);
+                setShowPurchaseCfm(false);
+              }}
+            />
+          </View>
+        )}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -248,9 +330,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F2EB',
     padding: 20,
   },
-  scrollContainer: {
-    flexGrow: 1,
-  },
+  scrollContainer: {},
   profileContainer: {
     alignItems: 'center',
     marginBottom: 20,
@@ -332,6 +412,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     alignSelf: 'center',
+    marginBottom: 20,
   },
   editProfileBtnText: {
     fontSize: 16,
@@ -374,6 +455,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 10,
+  },
+  btmSheetContainer: {
+    flex: 1,
   },
 });
 

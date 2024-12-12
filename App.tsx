@@ -5,8 +5,6 @@ import LoadScreen from './src/screens/LoadScreen';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import UserContext from './src/components/context/UserContext';
-import CreateListingBoard from './src/screens/BizUser/CreateListingBoard';
-import ListingDetailBoard from './src/screens/BizUser/ListingDetailBoard';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);

@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   },
   bizText: {
     fontFamily: 'Figtree-regular',
-    color: '#53ACFF',
+    color: '#3ABECF',
     fontSize: 20,
     textAlign: 'right',
     paddingRight: 80,
@@ -118,12 +118,8 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 25,
     borderWidth: 2,
-    // borderColor: 'rgba(83, 172, 255, 1)',
-    // shadowColor: 'rgba(83, 172, 255, 1)',
-    shadowColor: 'rgba(255, 74, 0, 1)',
-
-    borderColor: 'rgba(255, 74, 0, 1)',
-
+    borderColor: '#FF7F50',
+    shadowColor: '#D64933',
     shadowOpacity: 1,
     shadowOffset: {width: 0, height: 0},
     shadowRadius: 15,
