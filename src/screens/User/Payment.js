@@ -100,7 +100,6 @@ const Payment = ({navigation}) => {
       if (error) {
         Alert.alert('Payment Failed', error.message);
       } else if (paymentIntent) {
-        // Alert.alert('Payment Successful', `Payment ID: ${paymentIntent.id}`);
         setUserDataInput({email: '', amount: ''});
         depositMoney(userDataInput.amount);
         setCurrentStep(prevInput => prevInput + 1);
@@ -152,15 +151,23 @@ const Payment = ({navigation}) => {
             onPress={() => {
               navigation.navigate('Payout');
             }}>
-            <Text>
-              Make a withdrawal{' '}
-              <Icon
-                name="cash-outline"
-                size={24}
-                color="#000"
-                style={styles.icon}
-              />
-            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: 10,
+              }}>
+              <Text>Make a withdrawal </Text>
+              <Text>
+                <Icon
+                  name="cash-outline"
+                  size={24}
+                  color="#000"
+                  style={styles.icon}
+                />
+              </Text>
+            </View>
           </Pressable>
         </View>
       )}
@@ -235,10 +242,10 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
     borderColor: '#000000',
-    borderRadius: 8,
+    borderRadius: 40,
   },
   cardContainer: {
-    height: 100,
+    height: 150,
     marginVertical: 20,
   },
   btn: {
@@ -248,7 +255,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '-15',
+    marginTop: '10',
     borderRadius: 25,
     borderWidth: 2,
     borderColor: 'rgba(83, 172, 255, 1)',

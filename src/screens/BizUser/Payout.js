@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '-15',
+    marginTop: '10',
     borderRadius: 25,
     borderWidth: 2,
     borderColor: 'rgba(83, 172, 255, 1)',
