@@ -76,7 +76,6 @@ const styles = StyleSheet.create({
     transform: [{scaleX: 1.1}, {skewX: '-10deg'}],
     letterSpacing: 0.2,
     color: '#F1F2EB',
-    // textShadowColor: 'rgba(83, 172, 255, 1)',
     textShadowColor: 'rgba(255, 74, 0, 1)',
     textShadowOffset: {width: 0, height: 0},
     textShadowRadius: 15,
@@ -90,8 +89,8 @@ const styles = StyleSheet.create({
   bizTextContainer: {
     position: 'absolute',
     zIndex: 2,
-    bottom: 30,
-    right: 0,
+    bottom: 50,
+    right: 10,
   },
   bizText: {
     fontFamily: 'Figtree-regular',

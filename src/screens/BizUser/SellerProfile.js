@@ -18,7 +18,7 @@ const SellerProfile = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const {accessToken} = useContext(UserContext);
   const [profileData, setProfileData] = useState([]);
-  const [subCount, setSubCount] = useState([]);
+  const [subCount, setSubCount] = useState(0);
   const [reviewData, setReviewData] = useState([]);
 
   const getProfileData = async () => {
@@ -56,7 +56,7 @@ const SellerProfile = ({navigation}) => {
       setIsLoading(true);
       const res = await axios.get(`${SERVER}/transaction/count`, {
         headers: {
-          authorisation: 'Bearer ' + accessToken,
+          authorization: 'Bearer ' + accessToken,
         },
       });
       setSubCount(res.data.count);
@@ -109,7 +109,7 @@ const SellerProfile = ({navigation}) => {
       <View style={styles.statsContainer}>
         <View style={styles.statBox}>
           <Text style={styles.statLabel}>Subscribers</Text>
-          <Text style={styles.statValue}>{subCount ? 0 : subCount}</Text>
+          <Text style={styles.statValue}>{subCount !== 0 ? subCount : 0}</Text>
         </View>
         <View style={styles.statBox}>
           <Text style={styles.statLabel}>Win Rate</Text>

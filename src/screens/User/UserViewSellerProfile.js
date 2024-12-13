@@ -18,6 +18,7 @@ import ReviewForm from '../../components/UserProfile/ReviewForm';
 import AwesomeAlert from 'react-native-awesome-alerts';
 import BottomSheetSub from '../../components/BottomSheetSub';
 import {useFocusEffect} from '@react-navigation/native';
+import {jwtDecode} from 'jwt-decode';
 
 const UserViewSellerProfile = ({route, navigation}) => {
   const {accessToken} = useContext(UserContext);
@@ -28,12 +29,22 @@ const UserViewSellerProfile = ({route, navigation}) => {
   const [userSubscriptionToSeller, setUserSubscriptionToSeller] = useState([]);
   const [sellerSubscription, setSellerSubscription] = useState([]);
   const [showReviewBtn, setShowReviewBtn] = useState(true);
-  const [sellerSubCount, setSellerSubCount] = useState([]);
+  const [sellerSubCount, setSellerSubCount] = useState(0);
   const [showPurchaseCfm, setShowPurchaseCfm] = useState(false);
   const [showPA, setShowPA] = useState(false);
   const [errorCtnr, setErrorCtnr] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState([]);
+
+  const getClaims = () => {
+    try {
+      const decoded = jwtDecode(accessToken);
+      setUserId(decoded.id);
+    } catch (error) {
+      console.error('Error retrieving claims', error.message);
+    }
+  };
 
   const getSellerProfile = async () => {
     setIsLoading(true);
@@ -101,6 +112,9 @@ const UserViewSellerProfile = ({route, navigation}) => {
       setShowPA(true);
       getUserSubscription();
     } catch (error) {
+      if (error.response) {
+        console.error(error.response);
+      }
       console.error(error.message);
       setErrorCtnr(error.message);
       setShowAlert(true);
@@ -122,11 +136,14 @@ const UserViewSellerProfile = ({route, navigation}) => {
 
   const getSellerSubCount = async () => {
     try {
-      const res = await axios.get(`${SERVER}/subscription/count`, {
-        header: {
-          authorization: 'Bearer ' + accessToken,
+      const res = await axios.get(
+        `${SERVER}/transaction/count/${route.params.sellerId}`,
+        {
+          headers: {
+            authorization: 'Bearer ' + accessToken,
+          },
         },
-      });
+      );
       setSellerSubCount(res.data.count);
     } catch (error) {
       console.error(error.message);
@@ -141,7 +158,10 @@ const UserViewSellerProfile = ({route, navigation}) => {
           authorization: 'Bearer ' + accessToken,
         },
       });
-      setUserReviewed(res.data.review);
+      const userReview = res.data.review.filter(
+        review => review.buyer_id === userId,
+      );
+      setUserReviewed(userReview);
     } catch (error) {
       console.error(error.message);
     }
@@ -201,9 +221,7 @@ const UserViewSellerProfile = ({route, navigation}) => {
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Subscribers</Text>
-            <Text style={styles.statValue}>
-              {sellerSubCount ? 0 : sellerSubCount}
-            </Text>
+            <Text style={styles.statValue}>{sellerSubCount}</Text>
           </View>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>Win Rate</Text>

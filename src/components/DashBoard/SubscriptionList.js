@@ -129,6 +129,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
   },
+  noTransactionText: {
+    color: 'white',
+  },
+  noTransactionContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default SubscriptionList;

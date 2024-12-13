@@ -32,7 +32,7 @@ const ReviewForm = props => {
           },
         },
       );
-      props.getReviewsByUserId();
+      await props.getReviewsByUserId();
       props.setShowReviewForm(false);
     } catch (error) {
       console.error(error.message);
@@ -42,7 +42,7 @@ const ReviewForm = props => {
     <View style={styles.reviewsContainer}>
       <Text style={styles.sectionTitle}>Title: </Text>
       <TextInput
-        style={styles.sectionText}
+        style={styles.reviewText}
         value={reviewInput.title}
         onChangeText={text =>
           setReviewInput(prevInput => ({...prevInput, title: text}))
@@ -73,23 +73,25 @@ const ReviewForm = props => {
           }
         />
       </View>
-      <CustomBtn
-        style={styles.editProfileBtn}
-        textStyle={styles.editProfileBtnText}
-        title={<Text>Submit Review</Text>}
-        onPress={() => {
-          createReview();
-        }}
-      />
-      <CustomBtn
-        style={styles.editProfileBtn}
-        textStyle={styles.editProfileBtnText}
-        title={<Text>Cancel</Text>}
-        onPress={() => {
-          props.setShowReviewForm(false);
-          props.setShowReviewBtn(true);
-        }}
-      />
+      <View style={styles.buttonRows}>
+        <CustomBtn
+          style={styles.editProfileBtn}
+          textStyle={styles.editProfileBtnText}
+          title={<Text>Submit Review</Text>}
+          onPress={() => {
+            createReview();
+          }}
+        />
+        <CustomBtn
+          style={styles.editProfileBtn}
+          textStyle={styles.editProfileBtnText}
+          title={<Text>Cancel</Text>}
+          onPress={() => {
+            props.setShowReviewForm(false);
+            props.setShowReviewBtn(true);
+          }}
+        />
+      </View>
     </View>
   );
 };
@@ -127,6 +129,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     marginBottom: 5,
+    borderWidth: 1,
+    height: 30,
   },
   reviewerName: {
     fontSize: 12,
@@ -150,6 +154,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
+  },
+  buttonRows: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
   },
 });
 
